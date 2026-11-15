@@ -15,7 +15,7 @@ After a few years on Telegram you are subscribed to hundreds of channels. Half o
 
 ## How tidygram works
 
-1. You log in with your Telegram account: a QR code on a computer, the Telegram app on a phone, or a phone number.
+1. You log in with your Telegram account: a QR code on a computer, or your phone number and a login code on a phone.
 2. tidygram shows your channels one at a time, as cards. **Dead channels come first** — the ones that haven't posted for the longest time.
 3. Each card shows the channel's description, subscriber count, when it last posted, and its latest posts, so you can decide in seconds.
 4. **Swipe left** to unsubscribe, **swipe right** to keep, or tap **Later** to decide later. On a computer the arrow keys do the same.
@@ -80,7 +80,7 @@ tidygram is an independent project. It is not affiliated with or endorsed by Tel
 
 ## Как работает tidygram
 
-1. Вы входите через свой аккаунт Telegram: по QR-коду на компьютере, через приложение Telegram на телефоне или по номеру.
+1. Вы входите через свой аккаунт Telegram: по QR-коду на компьютере или по номеру телефона и коду на телефоне.
 2. tidygram показывает каналы по одному, в виде карточек. **Сначала идут мёртвые каналы** — те, где дольше всего не было публикаций.
 3. На карточке — описание канала, число подписчиков, дата последнего поста и сами последние посты. Решение принимается за секунды.
 4. **Свайп влево** — отписаться, **свайп вправо** — оставить, кнопка **«Позже»** — решить позже. На компьютере то же самое делают стрелки на клавиатуре.
