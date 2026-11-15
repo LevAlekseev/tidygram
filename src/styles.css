@@ -239,21 +239,6 @@ a {
   font-size: 14px;
 }
 
-/* Computers show the QR code, phones and tablets show the "open the app" button. */
-.same-device {
-  display: none;
-}
-
-@media (hover: none) and (pointer: coarse) {
-  .same-device {
-    display: flex;
-  }
-
-  .other-device {
-    display: none;
-  }
-}
-
 .steps {
   padding-left: 22px;
   color: var(--muted);

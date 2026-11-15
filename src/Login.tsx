@@ -13,6 +13,21 @@ interface Ctl {
   cancelled: boolean;
 }
 
+function sameDevice(): boolean {
+  return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || matchMedia('(pointer: coarse)').matches;
+}
+
+/** Telegram wants the international format. People often type it the local way. */
+export function normalizePhone(input: string, lang: string): string {
+  let digits = input.replace(/\D/g, '');
+  if (digits.startsWith('00')) digits = digits.slice(2);
+  // Russian habit: 8 999 123-45-67 means +7 999 123-45-67.
+  else if (lang === 'ru' && !input.trim().startsWith('+') && digits.length === 11 && digits[0] === '8') {
+    digits = '7' + digits.slice(1);
+  }
+  return '+' + digits;
+}
+
 export function Login({ onDone }: { onDone(): void }) {
   const i18n = useI18n();
   const { t } = i18n;
@@ -89,8 +104,11 @@ export function Login({ onDone }: { onDone(): void }) {
     ctl.current = c;
     setErr('');
     setBusy(true);
-    run(c, loginPhone(phone.replace(/[^\d+]/g, ''), makeUi(c)));
+    run(c, loginPhone(normalizePhone(phone, i18n.lang), makeUi(c)));
   };
+
+  // Phones and tablets cannot scan a QR code shown on their own screen.
+  const isTouch = sameDevice();
 
   const submitPrompt = (e: FormEvent) => {
     e.preventDefault();
@@ -148,11 +166,12 @@ export function Login({ onDone }: { onDone(): void }) {
     return (
       <form className="login" onSubmit={submitPhone}>
         <label htmlFor="login-phone">{t('phoneLabel')}</label>
+        <p className="muted">{t('phoneHelp')}</p>
         <input
           id="login-phone"
           type="tel"
           autoComplete="tel"
-          placeholder="+"
+          placeholder={t('phonePlaceholder')}
           autoFocus
           required
           value={phone}
@@ -163,7 +182,7 @@ export function Login({ onDone }: { onDone(): void }) {
           {t('sendCode')}
         </button>
         <button className="btn link" type="button" onClick={() => setMode('qr')}>
-          {t('useQr')}
+          {t(isTouch ? 'openInApp' : 'useQr')}
         </button>
       </form>
     );
@@ -172,26 +191,28 @@ export function Login({ onDone }: { onDone(): void }) {
   return (
     <div className="login">
       <h2>{t('loginTitle')}</h2>
-      {/* On a phone you cannot scan your own screen: this link opens the Telegram app
-          on the same device, which asks to confirm the login. */}
-      <div className="same-device">
-        {link ? (
-          <a className="btn primary" href={link}>
-            {t('openInApp')}
-          </a>
-        ) : (
-          <div className="spinner" />
-        )}
-        <p className="muted center">{t('openInAppHelp')}</p>
-      </div>
-      <div className="other-device">
-        <div className="qr">{qr ? <img src={qr} alt="QR" /> : <div className="spinner" />}</div>
-        <ol className="steps">
-          <li>{t('qrStep1')}</li>
-          <li>{t('qrStep2')}</li>
-          <li>{t('qrStep3')}</li>
-        </ol>
-      </div>
+      {isTouch ? (
+        // This link opens the Telegram app on the same device, which asks to confirm the login.
+        <div className="same-device">
+          {link ? (
+            <a className="btn primary" href={link}>
+              {t('openInApp')}
+            </a>
+          ) : (
+            <div className="spinner" />
+          )}
+          <p className="muted center">{t('openInAppHelp')}</p>
+        </div>
+      ) : (
+        <>
+          <div className="qr">{qr ? <img src={qr} alt="QR" /> : <div className="spinner" />}</div>
+          <ol className="steps">
+            <li>{t('qrStep1')}</li>
+            <li>{t('qrStep2')}</li>
+            <li>{t('qrStep3')}</li>
+          </ol>
+        </>
+      )}
       {error}
       <button className="btn link" type="button" onClick={() => setMode('phone')}>
         {t('usePhone')}
