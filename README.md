@@ -5,7 +5,7 @@ A simple, open-source way to clean up years of forgotten Telegram channels.
 
 [Русская версия ниже](#tidygram-по-русски)
 
-> **Status: early development.** The app is not usable yet. This README describes what is being built.
+> **Status: early development.** The first version works in demo mode with made-up channels. Logging in with a real Telegram account is implemented but not yet tested, and there is no hosted site yet.
 
 ## The problem
 
@@ -16,10 +16,10 @@ After a few years on Telegram you are subscribed to hundreds of channels. Half o
 1. You log in with your Telegram account (QR code or phone number).
 2. tidygram shows your channels one at a time, as cards. **Dead channels come first** — the ones that haven't posted for the longest time.
 3. Each card shows the channel's description, subscriber count, when it last posted, and its latest posts, so you can decide in seconds.
-4. **Swipe left** to unsubscribe, **swipe right** to keep, **swipe up** to decide later.
+4. **Swipe left** to unsubscribe, **swipe right** to keep, or tap **Later** to decide later. On a computer the arrow keys do the same.
 5. Nothing happens immediately. At the end you see the full list of channels you chose to leave, and you confirm it. Until then you can undo anything.
 
-After channels, you can optionally go through groups, and then private chats, the same way.
+Planned next: going through groups, and then private chats, the same way.
 
 ## Your data is safe
 
@@ -42,6 +42,19 @@ tidygram needs access to your Telegram account to see your subscriptions, so it 
 
 React + TypeScript, [GramJS](https://github.com/gram-js/gramjs) (Telegram MTProto client for the browser), built with Vite, hosted as a static site.
 
+Everything tidygram asks Telegram to do lives in one file: [`src/telegram/real.ts`](src/telegram/real.ts).
+
+## Run it yourself
+
+You need [Node.js](https://nodejs.org) 20 or newer.
+
+```bash
+npm install
+npm run dev
+```
+
+Open the address it prints. The demo works right away. To log in with a real account, get an `api_id` and `api_hash` at [my.telegram.org](https://my.telegram.org) → *API development tools*, copy `.env.example` to `.env.local` and fill them in.
+
 ## License
 
 [MIT](LICENSE)
@@ -55,7 +68,7 @@ tidygram is an independent project. It is not affiliated with or endorsed by Tel
 **Свайп влево — отписаться. Свайп вправо — оставить.**
 Простой способ с открытым кодом разобрать Telegram-каналы, накопившиеся за годы.
 
-> **Статус: ранняя разработка.** Пользоваться приложением пока нельзя. Здесь описано то, что строится.
+> **Статус: ранняя разработка.** Первая версия работает в демо-режиме с выдуманными каналами. Вход в настоящий аккаунт Telegram написан, но ещё не проверен, и размещённого сайта пока нет.
 
 ## Проблема
 
@@ -66,10 +79,10 @@ tidygram is an independent project. It is not affiliated with or endorsed by Tel
 1. Вы входите через свой аккаунт Telegram (QR-код или номер телефона).
 2. tidygram показывает каналы по одному, в виде карточек. **Сначала идут мёртвые каналы** — те, где дольше всего не было публикаций.
 3. На карточке — описание канала, число подписчиков, дата последнего поста и сами последние посты. Решение принимается за секунды.
-4. **Свайп влево** — отписаться, **свайп вправо** — оставить, **свайп вверх** — решить позже.
+4. **Свайп влево** — отписаться, **свайп вправо** — оставить, кнопка **«Позже»** — решить позже. На компьютере то же самое делают стрелки на клавиатуре.
 5. Сразу ничего не происходит. В конце вы видите полный список каналов «на выход» и подтверждаете его. До этого любое решение можно отменить.
 
-После каналов можно так же пройтись по группам, а затем и по личным чатам — по желанию.
+В планах: так же пройтись по группам, а затем и по личным чатам.
 
 ## Ваши данные в безопасности
 
@@ -91,6 +104,19 @@ tidygram is an independent project. It is not affiliated with or endorsed by Tel
 ## Технологии
 
 React + TypeScript, [GramJS](https://github.com/gram-js/gramjs) (клиент Telegram MTProto для браузера), сборка на Vite, размещение как статический сайт.
+
+Всё, что tidygram просит у Telegram, находится в одном файле: [`src/telegram/real.ts`](src/telegram/real.ts).
+
+## Запустить самому
+
+Нужен [Node.js](https://nodejs.org) версии 20 или новее.
+
+```bash
+npm install
+npm run dev
+```
+
+Откройте адрес, который появится в терминале. Демо работает сразу. Чтобы войти в настоящий аккаунт, получите `api_id` и `api_hash` на [my.telegram.org](https://my.telegram.org) → *API development tools*, скопируйте `.env.example` в `.env.local` и впишите их туда.
 
 ## Лицензия
 

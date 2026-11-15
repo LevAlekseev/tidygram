@@ -1,0 +1,28 @@
+{
+  "name": "tidygram",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Swipe left to unsubscribe, swipe right to keep. Serverless cleaner for your Telegram channels.",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "qrcode": "^1.5.4",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "telegram": "^2.26.22"
+  },
+  "devDependencies": {
+    "@types/qrcode": "^1.5.6",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^6.3.0",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.8",
+    "vite-plugin-node-polyfills": "^0.28.0"
+  }
+}
