@@ -18,6 +18,7 @@ export function Login({ onDone }: { onDone(): void }) {
   const { t } = i18n;
   const [mode, setMode] = useState<'qr' | 'phone'>('qr');
   const [qr, setQr] = useState('');
+  const [link, setLink] = useState('');
   const [prompt, setPrompt] = useState<Prompt | null>(null);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState('');
@@ -28,6 +29,7 @@ export function Login({ onDone }: { onDone(): void }) {
   const makeUi = (c: Ctl): AuthUi => ({
     isCancelled: () => c.cancelled,
     onQr: (url) => {
+      if (!c.cancelled) setLink(url);
       QRCode.toDataURL(url, { margin: 1, width: 520 }).then((data) => {
         if (!c.cancelled) setQr(data);
       });
@@ -69,6 +71,7 @@ export function Login({ onDone }: { onDone(): void }) {
     const c: Ctl = { cancelled: false };
     ctl.current = c;
     setQr('');
+    setLink('');
     setPrompt(null);
     setErr('');
     setBusy(false);
@@ -169,12 +172,26 @@ export function Login({ onDone }: { onDone(): void }) {
   return (
     <div className="login">
       <h2>{t('loginTitle')}</h2>
-      <div className="qr">{qr ? <img src={qr} alt="QR" /> : <div className="spinner" />}</div>
-      <ol className="steps">
-        <li>{t('qrStep1')}</li>
-        <li>{t('qrStep2')}</li>
-        <li>{t('qrStep3')}</li>
-      </ol>
+      {/* On a phone you cannot scan your own screen: this link opens the Telegram app
+          on the same device, which asks to confirm the login. */}
+      <div className="same-device">
+        {link ? (
+          <a className="btn primary" href={link}>
+            {t('openInApp')}
+          </a>
+        ) : (
+          <div className="spinner" />
+        )}
+        <p className="muted center">{t('openInAppHelp')}</p>
+      </div>
+      <div className="other-device">
+        <div className="qr">{qr ? <img src={qr} alt="QR" /> : <div className="spinner" />}</div>
+        <ol className="steps">
+          <li>{t('qrStep1')}</li>
+          <li>{t('qrStep2')}</li>
+          <li>{t('qrStep3')}</li>
+        </ol>
+      </div>
       {error}
       <button className="btn link" type="button" onClick={() => setMode('phone')}>
         {t('usePhone')}

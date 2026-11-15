@@ -103,21 +103,27 @@ function base64url(bytes: Uint8Array): string {
 /** Log in by scanning a QR code from the Telegram app on the phone. */
 export async function loginQr(ui: AuthUi): Promise<void> {
   const client = await getClient();
-  await client.signInUserWithQrCode(
-    { apiId: API_ID, apiHash: API_HASH },
-    {
-      qrCode: async ({ token }) => {
-        if (ui.isCancelled()) throw new Error('CANCELLED');
-        ui.onQr?.('tg://login?token=' + base64url(token));
+  try {
+    await client.signInUserWithQrCode(
+      { apiId: API_ID, apiHash: API_HASH },
+      {
+        qrCode: async ({ token }) => {
+          if (ui.isCancelled()) throw new Error('CANCELLED');
+          ui.onQr?.('tg://login?token=' + base64url(token));
+        },
+        password: async (hint) => ui.askPassword(hint),
+        onError: async (err) => {
+          if (ui.isCancelled()) return true;
+          ui.onError(errText(err));
+          return false;
+        },
       },
-      password: async (hint) => ui.askPassword(hint),
-      onError: async (err) => {
-        if (ui.isCancelled()) return true;
-        ui.onError(errText(err));
-        return false;
-      },
-    },
-  );
+    );
+  } catch (err) {
+    // A phone may suspend this page while the Telegram app is open, so the "login confirmed"
+    // notification can be missed. If the login did go through, carry on.
+    if (ui.isCancelled() || !(await client.checkAuthorization().catch(() => false))) throw err;
+  }
   persist(client);
 }
 

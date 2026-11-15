@@ -5,7 +5,9 @@ A simple, open-source way to clean up years of forgotten Telegram channels.
 
 [Русская версия ниже](#tidygram-по-русски)
 
-> **Status: early development.** The first version works in demo mode with made-up channels. Logging in with a real Telegram account is implemented but not yet tested, and there is no hosted site yet.
+**Open it: https://levalekseev.github.io/tidygram/** — nothing to install. There is a demo you can try without logging in.
+
+> **Status: early version.** It works, but it has been tested on very few accounts. Groups and private chats are not supported yet. If something breaks, please [open an issue](https://github.com/LevAlekseev/tidygram/issues).
 
 ## The problem
 
@@ -13,7 +15,7 @@ After a few years on Telegram you are subscribed to hundreds of channels. Half o
 
 ## How tidygram works
 
-1. You log in with your Telegram account (QR code or phone number).
+1. You log in with your Telegram account: a QR code on a computer, the Telegram app on a phone, or a phone number.
 2. tidygram shows your channels one at a time, as cards. **Dead channels come first** — the ones that haven't posted for the longest time.
 3. Each card shows the channel's description, subscriber count, when it last posted, and its latest posts, so you can decide in seconds.
 4. **Swipe left** to unsubscribe, **swipe right** to keep, or tap **Later** to decide later. On a computer the arrow keys do the same.
@@ -68,7 +70,9 @@ tidygram is an independent project. It is not affiliated with or endorsed by Tel
 **Свайп влево — отписаться. Свайп вправо — оставить.**
 Простой способ с открытым кодом разобрать Telegram-каналы, накопившиеся за годы.
 
-> **Статус: ранняя разработка.** Первая версия работает в демо-режиме с выдуманными каналами. Вход в настоящий аккаунт Telegram написан, но ещё не проверен, и размещённого сайта пока нет.
+**Открыть: https://levalekseev.github.io/tidygram/** — устанавливать ничего не нужно. Есть демо, которое можно попробовать без входа.
+
+> **Статус: ранняя версия.** Она работает, но проверена на очень небольшом числе аккаунтов. Группы и личные чаты пока не поддерживаются. Если что-то сломалось, пожалуйста, [создайте issue](https://github.com/LevAlekseev/tidygram/issues).
 
 ## Проблема
 
@@ -76,7 +80,7 @@ tidygram is an independent project. It is not affiliated with or endorsed by Tel
 
 ## Как работает tidygram
 
-1. Вы входите через свой аккаунт Telegram (QR-код или номер телефона).
+1. Вы входите через свой аккаунт Telegram: по QR-коду на компьютере, через приложение Telegram на телефоне или по номеру.
 2. tidygram показывает каналы по одному, в виде карточек. **Сначала идут мёртвые каналы** — те, где дольше всего не было публикаций.
 3. На карточке — описание канала, число подписчиков, дата последнего поста и сами последние посты. Решение принимается за секунды.
 4. **Свайп влево** — отписаться, **свайп вправо** — оставить, кнопка **«Позже»** — решить позже. На компьютере то же самое делают стрелки на клавиатуре.
