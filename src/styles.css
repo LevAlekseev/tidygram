@@ -239,6 +239,13 @@ a {
   font-size: 14px;
 }
 
+.code-where {
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--accent) 14%, transparent);
+  font-size: 15px;
+}
+
 .steps {
   padding-left: 22px;
   color: var(--muted);

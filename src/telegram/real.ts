@@ -89,7 +89,8 @@ function persist(client: TelegramClient) {
 export interface AuthUi {
   isCancelled(): boolean;
   onQr?(url: string): void;
-  askCode?(): Promise<string>;
+  /** Resolves with the code, or with RESEND to ask Telegram for another delivery method. */
+  askCode?(info: CodeInfo): Promise<string>;
   askPassword(hint?: string): Promise<string>;
   onError(message: string): void;
 }
@@ -130,19 +131,73 @@ export async function loginQr(ui: AuthUi): Promise<void> {
 /** Log in with a phone number and the code Telegram sends to the app. */
 export async function loginPhone(phone: string, ui: AuthUi): Promise<void> {
   const client = await getClient();
-  await client.start({
-    phoneNumber: async () => phone,
-    phoneCode: async () => ui.askCode!(),
-    password: async (hint) => ui.askPassword(hint),
-    onError: async (err) => {
-      if (ui.isCancelled()) return true;
+  const { Api } = await import('telegram');
+  const credentials = { apiId: API_ID, apiHash: API_HASH };
+
+  let sent: any = await client.invoke(
+    new Api.auth.SendCode({ phoneNumber: phone, ...credentials, settings: new Api.CodeSettings({}) }),
+  );
+
+  // Ask for the code until it is accepted. Telegram decides how the code is delivered
+  // (app message, e-mail, SMS, call), so tell the user where to look.
+  while (sent.className !== 'auth.SentCodeSuccess') {
+    if (sent.type?.className === 'auth.SentCodeTypeSetUpEmailRequired') throw new Error('EMAIL_SETUP_REQUIRED');
+    const answer = await ui.askCode!(codeInfo(sent));
+    if (ui.isCancelled()) throw new Error('CANCELLED');
+    try {
+      if (answer === RESEND) {
+        sent = await client.invoke(
+          new Api.auth.ResendCode({ phoneNumber: phone, phoneCodeHash: sent.phoneCodeHash }),
+        );
+        continue;
+      }
+      const result: any = await client.invoke(
+        new Api.auth.SignIn({ phoneNumber: phone, phoneCodeHash: sent.phoneCodeHash, phoneCode: answer }),
+      );
+      if (result.className === 'auth.AuthorizationSignUpRequired') throw new Error('PHONE_NUMBER_UNOCCUPIED');
+      break;
+    } catch (err) {
       const message = errText(err);
+      if (message === 'SESSION_PASSWORD_NEEDED') {
+        await client.signInWithPassword(credentials, {
+          password: async (hint) => ui.askPassword(hint),
+          onError: async (e) => {
+            if (ui.isCancelled()) return true;
+            ui.onError(errText(e));
+            return !/PASSWORD_HASH_INVALID/.test(errText(e));
+          },
+        });
+        break;
+      }
+      // A mistyped code can be retried; anything else stops the attempt.
+      if (!/PHONE_CODE_INVALID|PHONE_CODE_EMPTY/.test(message)) throw err;
       ui.onError(message);
-      // A mistyped code or password can be retried; anything else stops the attempt.
-      return !/PHONE_CODE_INVALID|PHONE_CODE_EMPTY|PASSWORD_HASH_INVALID/.test(message);
-    },
-  });
+    }
+  }
   persist(client);
+}
+
+export const RESEND = '\u0000resend';
+
+export type CodeVia = 'app' | 'sms' | 'call' | 'email' | 'fragment' | 'other';
+
+export interface CodeInfo {
+  via: CodeVia;
+  /** Masked e-mail address, when the code went to e-mail. */
+  detail?: string;
+  /** Telegram offers another delivery method. */
+  canResend: boolean;
+}
+
+function codeInfo(sent: any): CodeInfo {
+  const cls: string = sent.type?.className || '';
+  let via: CodeVia = 'other';
+  if (cls.endsWith('TypeApp')) via = 'app';
+  else if (cls.includes('Email')) via = 'email';
+  else if (cls.includes('Fragment')) via = 'fragment';
+  else if (cls.includes('Sms')) via = 'sms';
+  else if (cls.includes('Call')) via = 'call';
+  return { via, detail: sent.type?.emailPattern || undefined, canResend: !!sent.nextType };
 }
 
 /* eslint-disable @typescript-eslint/no-explicit-any */

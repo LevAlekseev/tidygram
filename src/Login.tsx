@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react';
 import QRCode from 'qrcode';
 import { useI18n } from './i18n';
-import { errText, loginPhone, loginQr, type AuthUi } from './telegram/real';
+import { RESEND, errText, loginPhone, loginQr, type AuthUi, type CodeInfo } from './telegram/real';
 
 interface Prompt {
   kind: 'code' | 'password';
   hint?: string;
+  info?: CodeInfo;
   resolve(value: string): void;
 }
 
@@ -49,11 +50,11 @@ export function Login({ onDone }: { onDone(): void }) {
         if (!c.cancelled) setQr(data);
       });
     },
-    askCode: () =>
+    askCode: (info) =>
       new Promise<string>((resolve) => {
         if (c.cancelled) return;
         setBusy(false);
-        setPrompt({ kind: 'code', resolve });
+        setPrompt({ kind: 'code', info, resolve });
       }),
     askPassword: (hint) =>
       new Promise<string>((resolve) => {
@@ -131,7 +132,11 @@ export function Login({ onDone }: { onDone(): void }) {
     return (
       <form className="login" onSubmit={submitPrompt}>
         <label htmlFor="login-input">{t(isCode ? 'codeLabel' : 'passwordLabel')}</label>
-        <p className="muted">{t(isCode ? 'codeHelp' : 'passwordHelp')}</p>
+        <p className={isCode ? 'code-where' : 'muted'}>
+          {isCode
+            ? t(`codeVia_${prompt.info?.via ?? 'app'}`, { detail: prompt.info?.detail ?? '' })
+            : t('passwordHelp')}
+        </p>
         {!isCode && prompt.hint && <p className="muted">{t('hint', { hint: prompt.hint })}</p>}
         <input
           id="login-input"
@@ -148,6 +153,21 @@ export function Login({ onDone }: { onDone(): void }) {
         <button className="btn primary" type="submit">
           {t('continue')}
         </button>
+        {isCode && prompt.info?.canResend && (
+          <button
+            className="btn link"
+            type="button"
+            onClick={() => {
+              setPrompt(null);
+              setValue('');
+              setErr('');
+              setBusy(true);
+              prompt.resolve(RESEND);
+            }}
+          >
+            {t('resendCode')}
+          </button>
+        )}
       </form>
     );
   }
